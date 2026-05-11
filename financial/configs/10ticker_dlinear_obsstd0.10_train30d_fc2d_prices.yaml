@@ -1,0 +1,42 @@
+model_type: dlinear_financial
+
+# =============================================================================
+# DATA
+# Reuses prepared windows from the 10-ticker TS lr5 prices experiment.
+# No separate prepare step needed.
+# =============================================================================
+data:
+  tickers: ["AAPL", "AMD", "AMZN", "GOOGL", "INTC", "META", "MSFT", "NFLX", "NVDA", "TSLA"]
+  interval: "1h"
+  start_date: "2024-06-01"
+  end_date: "2026-04-16"
+  obs_std: 0.10
+  prepared_name: aapl_amd_amzn_googl_intc_meta_msft_nflx_nvda_tsla_ts_a1.90_sig1.0_obsstd0.10_train30d_fc2d_d2w32_lr5_prices
+
+# =============================================================================
+# ROLLING WINDOW
+# =============================================================================
+window:
+  train_length: 30.0
+  forecast_horizon: 2.0
+
+# =============================================================================
+# MODEL
+# DLinear operates independently per dimension — scales naturally to D=10.
+# =============================================================================
+model:
+  kernel_size: 25          # moving-average window (hours); 25h ≈ 1 trading day
+  lookback_len: 48         # input lookback (hours); 48h ≈ 2 trading days
+
+# =============================================================================
+# TRAINING
+# =============================================================================
+training:
+  learning_rate: 0.001
+  training_steps: 2000
+
+# =============================================================================
+# EVALUATION
+# =============================================================================
+evaluation:
+  n_forecast_samples: 1000   # K identical copies → CRPS = MAE

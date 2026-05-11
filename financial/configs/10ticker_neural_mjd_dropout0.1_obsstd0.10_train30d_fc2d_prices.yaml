@@ -1,0 +1,48 @@
+model_type: neural_mjd_financial
+
+# =============================================================================
+# DATA
+# Reuses prepared windows from the 10-ticker TS lr5 prices experiment.
+# No separate prepare step needed.
+# =============================================================================
+data:
+  tickers: ["AAPL", "AMD", "AMZN", "GOOGL", "INTC", "META", "MSFT", "NFLX", "NVDA", "TSLA"]
+  interval: "1h"
+  start_date: "2024-06-01"
+  end_date: "2026-04-16"
+  obs_std: 0.10
+  prepared_name: aapl_amd_amzn_googl_intc_meta_msft_nflx_nvda_tsla_ts_a1.90_sig1.0_obsstd0.10_train30d_fc2d_d2w32_lr5_prices
+
+# =============================================================================
+# ROLLING WINDOW
+# =============================================================================
+window:
+  train_length: 30.0      # days
+  forecast_horizon: 2.0   # days
+
+# =============================================================================
+# MODEL
+# dropout_rate=0.1 prevents sigma/gamma collapse (confirmed canonical setting).
+# obs_dim is inferred from data at runtime — D=10 scales naturally through the MLP.
+# =============================================================================
+model:
+  lookback_len: 48
+  mlp_width: 256
+  mlp_depth: 3
+  n_mjd_kappa: 5
+  dropout_rate: 0.1
+
+# =============================================================================
+# TRAINING
+# =============================================================================
+training:
+  w_cond_mean: 1.0
+  learning_rate: 0.001
+  training_steps: 3000
+
+# =============================================================================
+# EVALUATION
+# =============================================================================
+evaluation:
+  n_forecast_samples: 1000
+  steps_per_unit: 5

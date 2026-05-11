@@ -1,0 +1,48 @@
+model_type: nhits_financial
+
+# =============================================================================
+# DATA
+# Reuses prepared windows from the 10-ticker TS lr5 prices experiment.
+# No separate prepare step needed.
+# =============================================================================
+data:
+  tickers: ["AAPL", "AMD", "AMZN", "GOOGL", "INTC", "META", "MSFT", "NFLX", "NVDA", "TSLA"]
+  interval: "1h"
+  start_date: "2024-06-01"
+  end_date: "2026-04-16"
+  obs_std: 0.10
+  prepared_name: aapl_amd_amzn_googl_intc_meta_msft_nflx_nvda_tsla_ts_a1.90_sig1.0_obsstd0.10_train30d_fc2d_d2w32_lr5_prices
+
+# =============================================================================
+# ROLLING WINDOW
+# =============================================================================
+window:
+  train_length: 30.0      # days
+  forecast_horizon: 2.0   # days
+
+# =============================================================================
+# MODEL
+# 3-stack N-HiTS with standard paper defaults.
+# N-HiTS operates independently per dimension — scales naturally to D=10.
+# =============================================================================
+model:
+  lookback_len: 48
+  n_stacks: 3
+  n_blocks_per_stack: 1
+  mlp_width: 512
+  mlp_depth: 2
+  n_pool_kernel_size: [2, 2, 1]
+  n_freq_downsample: [4, 2, 1]
+
+# =============================================================================
+# TRAINING
+# =============================================================================
+training:
+  learning_rate: 0.001
+  training_steps: 3000
+
+# =============================================================================
+# EVALUATION
+# =============================================================================
+evaluation:
+  n_forecast_samples: 1000   # K identical copies → CRPS = MAE

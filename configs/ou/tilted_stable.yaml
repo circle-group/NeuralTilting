@@ -1,0 +1,61 @@
+# Example configuration: Tilted-Stable SDE on the Ornstein-Uhlenbeck dataset.
+# Alpha controls tail heaviness (1 < alpha < 2). Adjust data.data_seed and
+# model.phi_seed to run independent replicates.
+
+model_type: tilted_stable_sde
+model:
+  alpha: 1.5
+  tau: 0.01
+  sigma: 1.0
+  state_dim: 1
+  tilting_width: 256
+  tilting_depth: 6
+  n_time_features: 0
+  period: 10.0
+  n_attention_references: 100
+  attention_embed_dim: 64
+  attention_sharpness: 100.0
+  use_adaptive_scaling: false
+  a_min: 0.001
+  trainable_drift: true
+  drift_seed: null
+  initial_drift_weight: null
+  initial_drift_bias: null
+  diffusion_seed: null
+  initial_diffusion_weight:
+  - 1.0
+  loss_sample_size: 1000
+  max_rejection_attempts: 50
+  max_jumps: 10
+  phi_seed: 713
+data:
+  data_seed: 42
+  state_init: 0.0
+  state_init_vector: null
+  n_obs_steps: 10000
+  time_start: 0.0
+  time_end: 10.0
+  obs_std: 0.1
+training:
+  learning_rate: 0.0001
+  lr_multiplier_mlp: 1.0
+  lr_multiplier_attention: 10.0
+  lr_multiplier_drift: 100
+  frozen_params:
+  - diffusion.raw_weight
+  training_steps: 3000
+  n_loss_samples: 500
+  n_latent_steps: 1000
+  obs_subsample_method: uniform
+  obs_subsample_count: 1000
+  obs_subsample_seed: 42
+  tilting_regularisation: 1.0e-05
+  drift_regularization: 0.1
+  coeff_A_regularization: 1.0e-05
+  coeff_B_regularization: 1.0e-05
+  gc_interval: 50
+  clear_cache_interval: 500
+  checkpoint_interval: 500
+output:
+  save_plots: true
+  plot_dpi: 200

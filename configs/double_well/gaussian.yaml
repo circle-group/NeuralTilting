@@ -1,0 +1,46 @@
+# Example configuration: Gaussian SDE baseline on the double-well potential dataset.
+# The drift is f(x) = theta1*x - theta2*x^3; both parameters are learned from data.
+
+model_type: gaussian_sde_double_well
+model:
+  sigma: 1.0
+  state_dim: 1
+  control_width: 256
+  control_depth: 6
+  n_time_features: 0
+  period: 10.0
+  control_seed: 321
+  trainable_drift: true
+  drift_seed: null
+  initial_drift_theta1: null
+  initial_drift_theta2: null
+  diffusion_seed: null
+  initial_diffusion_weight:
+  - 1.0
+data:
+  alpha: 1.5
+  data_seed: 42
+  obs_std: 0.1
+  state_init: 0.0
+  state_init_vector: null
+  n_obs_steps: 10000
+  time_start: 0.0
+  time_end: 10.0
+training:
+  learning_rate: 0.0001
+  transition_steps: 100
+  decay_rate: 0.95
+  training_steps: 3000
+  n_loss_samples: 500
+  n_latent_steps: 1000
+  obs_subsample_method: uniform
+  obs_subsample_count: 1000
+  obs_subsample_seed: 42
+  control_regularisation: 0.5
+  drift_regularization: 0.01
+  gc_interval: 50
+  clear_cache_interval: 500
+  checkpoint_interval: 100
+output:
+  save_plots: true
+  plot_dpi: 200

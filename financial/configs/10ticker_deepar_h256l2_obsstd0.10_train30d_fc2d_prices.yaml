@@ -1,0 +1,45 @@
+model_type: deepar_financial
+
+# =============================================================================
+# DATA
+# Reuses prepared windows from the 10-ticker TS lr5 prices experiment.
+# No separate prepare step needed.
+# =============================================================================
+data:
+  tickers: ["AAPL", "AMD", "AMZN", "GOOGL", "INTC", "META", "MSFT", "NFLX", "NVDA", "TSLA"]
+  interval: "1h"
+  start_date: "2024-06-01"
+  end_date: "2026-04-16"
+  obs_std: 0.10
+  prepared_name: aapl_amd_amzn_googl_intc_meta_msft_nflx_nvda_tsla_ts_a1.90_sig1.0_obsstd0.10_train30d_fc2d_d2w32_lr5_prices
+
+# =============================================================================
+# ROLLING WINDOW
+# =============================================================================
+window:
+  train_length: 30.0      # days
+  forecast_horizon: 2.0   # days
+
+# =============================================================================
+# MODEL
+# Capacity-matched variant from univariate experiments (h256 L2 ~790K params).
+# At D=10 the LSTM input dimension scales automatically; hidden size unchanged.
+# =============================================================================
+model:
+  lstm_hidden_size: 256
+  lstm_n_layers: 2
+  decoder_hidden_layers: 1
+  decoder_hidden_size: 256
+
+# =============================================================================
+# TRAINING
+# =============================================================================
+training:
+  learning_rate: 0.001
+  training_steps: 3000
+
+# =============================================================================
+# EVALUATION
+# =============================================================================
+evaluation:
+  n_forecast_samples: 1000

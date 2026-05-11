@@ -1,0 +1,51 @@
+model_type: neural_jump_sde_financial
+variant: reg   # AdamW weight_decay=1e-5 (paper default) + lr=0.0003
+
+# =============================================================================
+# DATA
+# Reuses prepared windows from the 10-ticker TS lr5 prices experiment.
+# No separate prepare step needed.
+# =============================================================================
+data:
+  tickers: ["AAPL", "AMD", "AMZN", "GOOGL", "INTC", "META", "MSFT", "NFLX", "NVDA", "TSLA"]
+  interval: "1h"
+  start_date: "2024-06-01"
+  end_date: "2026-04-16"
+  obs_std: 0.10
+  prepared_name: aapl_amd_amzn_googl_intc_meta_msft_nflx_nvda_tsla_ts_a1.90_sig1.0_obsstd0.10_train30d_fc2d_d2w32_lr5_prices
+
+# =============================================================================
+# ROLLING WINDOW
+# =============================================================================
+window:
+  train_length: 30.0
+  forecast_horizon: 2.0
+
+# =============================================================================
+# MODEL
+# Same architecture as canonical univariate reg config.
+# obs_dim is inferred from data at runtime (D=10).
+# L output grows to M*(1+2*D) = 105 params automatically.
+# =============================================================================
+model:
+  dim_c: 32
+  dim_h: 32
+  n_mixtures: 5
+  hidden_width: 64
+  hidden_depth: 2
+  ortho: true
+  n_ode_steps: 4
+
+# =============================================================================
+# TRAINING
+# =============================================================================
+training:
+  learning_rate: 0.0003
+  weight_decay: 0.00001
+  training_steps: 3000
+
+# =============================================================================
+# EVALUATION
+# =============================================================================
+evaluation:
+  n_forecast_samples: 1000

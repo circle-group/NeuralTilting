@@ -1,0 +1,89 @@
+model_type: tilted_stable_sde_financial
+variant: d2w32                   # drift_depth=2 width=32, tilting kept at 6×256, sigma=1
+
+# =============================================================================
+# DATA
+# =============================================================================
+data:
+  tickers: ["GOOGL"]
+  interval: "1h"
+  start_date: "2024-04-15"
+  end_date: "2026-03-01"
+  obs_std: 0.10
+  time_scale: 0.033333           # 1/30: maps 30-day window onto [0,1]
+
+# =============================================================================
+# ROLLING WINDOW
+# =============================================================================
+window:
+  train_length: 30.0
+  forecast_horizon: 2.0
+
+# =============================================================================
+# MODEL
+# =============================================================================
+model:
+  alpha: 1.9
+  tau: 0.01
+  sigma: 1.0
+  state_dim: 1
+
+  tilting_width: 256
+  tilting_depth: 6
+  n_time_features: 0
+  period: 1.0
+  n_attention_references: 100
+  attention_embed_dim: 64
+  attention_sharpness: 100.0
+  use_adaptive_scaling: false
+  a_min: 0.001
+
+  drift_width: 32
+  drift_depth: 2
+  trainable_drift: true
+
+  initial_diffusion_weight: [1.0]
+
+  loss_sample_size: 500
+  max_rejection_attempts: 50
+  max_jumps: 20
+
+  drift_seed: null
+  diffusion_seed: null
+  phi_seed: null
+
+# =============================================================================
+# TRAINING
+# =============================================================================
+training:
+  learning_rate: 0.0001
+  lr_multiplier_mlp: 1.0
+  lr_multiplier_attention: 10.0
+  lr_multiplier_drift: 0.05
+
+  frozen_params:
+    - diffusion.raw_weight
+
+  training_steps: 3000
+  n_loss_samples: 500
+  n_latent_steps: 1000
+
+  obs_subsample_method: all
+  obs_subsample_count: 1000
+  obs_subsample_seed: 42
+
+  tilting_regularisation: 0.01
+  drift_regularization: 2.0
+  coeff_A_regularization: 0.00001
+  coeff_B_regularization: 0.00001
+
+  gc_interval: 50
+  clear_cache_interval: 500
+  checkpoint_interval: 0
+
+# =============================================================================
+# EVALUATION
+# =============================================================================
+evaluation:
+  n_forecast_samples: 1000
+  path_weight_threshold: 20.0

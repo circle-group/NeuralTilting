@@ -1,0 +1,82 @@
+model_type: gaussian_sde_financial_multivariate
+variant: d2w32_creg2_chol         # drift_depth=2 width=32, control 6×256, cholesky 2×32, creg=2.0
+
+# =============================================================================
+# DATA
+# =============================================================================
+data:
+  tickers: ["NVDA", "GOOGL", "MSFT", "AAPL", "AMZN", "META", "TSLA", "AMD", "NFLX", "INTC"]
+  interval: "1h"
+  start_date: "2024-06-01"       # same as TS for fair comparison
+  end_date: "2026-04-13"
+  obs_std: 0.20                  # best single-ticker Gaussian (creg2+obsstd=0.20)
+  time_scale: 0.033333           # 1/30: maps 30-day window onto [0,1]
+
+# =============================================================================
+# ROLLING WINDOW
+# =============================================================================
+window:
+  train_length: 30.0
+  forecast_horizon: 2.0
+
+# =============================================================================
+# MODEL
+# =============================================================================
+model:
+  sigma: 1.0
+  state_dim: 10                  # One dimension per ticker
+
+  # Control network
+  control_width: 256
+  control_depth: 6
+  n_time_features: 0
+
+  # Cholesky diffusion L(t, x): lower-triangular (D×D), initialized to I
+  cholesky_width: 32
+  cholesky_depth: 2
+
+  # MLP drift
+  drift_width: 32
+  drift_depth: 2
+  trainable_drift: true
+
+  use_gradient_checkpointing: true
+
+  # Seeds (null = auto-generated per window)
+  drift_seed: null
+  diffusion_seed: null
+  control_seed: null
+
+# =============================================================================
+# TRAINING
+# =============================================================================
+training:
+  learning_rate: 0.0001
+  lr_multiplier_drift: 0.1
+  transition_steps: 100
+  decay_rate: 0.95
+
+  training_steps: 6000
+  n_loss_samples: 200
+  n_latent_steps: 1000
+
+  obs_subsample_method: all
+  obs_subsample_count: 1000
+  obs_subsample_seed: 42
+
+  frozen_params: []              # diffusion (CholeskyDiffusion) is trainable
+
+  control_regularisation: 2.0
+  drift_regularization: 0.5
+  cholesky_regularisation: 1.0
+
+  gc_interval: 50
+  clear_cache_interval: 500
+  checkpoint_interval: 0
+
+# =============================================================================
+# EVALUATION
+# =============================================================================
+evaluation:
+  n_forecast_samples: 1000
+  path_weight_threshold: 20.0

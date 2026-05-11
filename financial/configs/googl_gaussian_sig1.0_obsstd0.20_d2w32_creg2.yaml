@@ -1,0 +1,79 @@
+model_type: gaussian_sde_financial
+variant: d2w32_creg2              # drift_depth=2 width=32, control kept at 6×256, sigma=1, control_reg=2.0
+
+# =============================================================================
+# DATA
+# =============================================================================
+data:
+  tickers: ["GOOGL"]
+  interval: "1h"
+  start_date: "2024-04-15"
+  end_date: "2026-03-01"
+  obs_std: 0.20
+  time_scale: 0.033333           # 1/30: maps 30-day window onto [0,1]
+
+# =============================================================================
+# ROLLING WINDOW
+# =============================================================================
+window:
+  train_length: 30.0
+  forecast_horizon: 2.0
+
+# =============================================================================
+# MODEL
+# =============================================================================
+model:
+  sigma: 1.0
+  state_dim: 1
+
+  # Control network
+  control_width: 256
+  control_depth: 6
+  n_time_features: 0
+
+  # MLP drift
+  drift_width: 32
+  drift_depth: 2
+  trainable_drift: true
+
+  # Diffusion (fixed)
+  initial_diffusion_weight: [1.0]
+
+  # Seeds (null = auto-generated per window)
+  drift_seed: null
+  diffusion_seed: null
+  control_seed: null
+
+# =============================================================================
+# TRAINING
+# =============================================================================
+training:
+  learning_rate: 0.0001
+  lr_multiplier_drift: 0.1
+  transition_steps: 100
+  decay_rate: 0.95
+
+  training_steps: 3000
+  n_loss_samples: 500
+  n_latent_steps: 1000
+
+  obs_subsample_method: all
+  obs_subsample_count: 1000
+  obs_subsample_seed: 42
+
+  frozen_params:
+    - diffusion.raw_weight
+
+  control_regularisation: 2.0
+  drift_regularization: 0.5
+
+  gc_interval: 50
+  clear_cache_interval: 500
+  checkpoint_interval: 0
+
+# =============================================================================
+# EVALUATION
+# =============================================================================
+evaluation:
+  n_forecast_samples: 1000
+  path_weight_threshold: 20.0

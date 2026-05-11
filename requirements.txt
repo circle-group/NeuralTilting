@@ -1,0 +1,32 @@
+# Core JAX libraries
+jax
+jaxlib
+jaxtyping
+
+# Equinox: PyTree-compatible neural network & module library
+equinox
+
+# Optimisation for JAX
+optax
+
+# Differential equation solvers
+diffrax
+
+# Scientific & numerical utilities
+numpy
+scipy
+pandas
+pyarrow       # parquet support for financial data caching
+
+# Plotting
+matplotlib
+
+# Financial data
+yfinance      # Yahoo Finance data download (financial experiments only)
+
+# Utilities
+tqdm
+
+# YAML handling with comment preservation
+ruamel.yaml
+pyyaml
